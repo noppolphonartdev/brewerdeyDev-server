@@ -93,7 +93,7 @@ const runOrderStatusSideEffects = async ({
       try {
         await sendMail({
           to: email,
-          subject: "CourseSi: อนุมัติการชำระเงินสำเร็จ",
+          subject: "BreweryDev: อนุมัติการชำระเงินสำเร็จ",
           text: `อนุมัติการชำระเงินสำเร็จสำหรับ "${courseTitle}" เข้าเรียนได้ที่ ${appUrl}/my-orders`,
           html: `
             <div style="font-family:Arial,sans-serif;line-height:1.6">
@@ -101,7 +101,7 @@ const runOrderStatusSideEffects = async ({
               <p>คำสั่งซื้อคอร์ส <b>${courseTitle}</b> ได้รับการอนุมัติแล้ว</p>
               <p>คุณสามารถเข้าเรียนได้ทันทีที่หน้า <a href="${appUrl}/my-orders">${appUrl}/my-orders</a></p>
               <hr />
-              <p style="color:#666;font-size:12px">CourseSi</p>
+              <p style="color:#666;font-size:12px">BreweryDev</p>
             </div>
           `,
         });
@@ -145,7 +145,7 @@ const runOrderStatusSideEffects = async ({
       try {
         await sendMail({
           to: email,
-          subject: "CourseSi: คำสั่งซื้อของคุณถูกปฏิเสธ",
+          subject: "BreweryDev: คำสั่งซื้อของคุณถูกปฏิเสธ",
           text: `${message}\nตรวจสอบได้ที่ ${appUrl}/my-orders`,
           html: `
             <div style="font-family:Arial,sans-serif;line-height:1.6">
@@ -154,7 +154,7 @@ const runOrderStatusSideEffects = async ({
               <p>${message}</p>
               <p>ตรวจสอบรายละเอียดที่หน้า <a href="${appUrl}/my-orders">${appUrl}/my-orders</a></p>
               <hr />
-              <p style="color:#666;font-size:12px">CourseSi</p>
+              <p style="color:#666;font-size:12px">BreweryDev</p>
             </div>
           `,
         });
