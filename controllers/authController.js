@@ -23,7 +23,7 @@ const generateToken = (user) => {
 };
 
 const sendVerificationEmail = async (user, token) => {
-  const url = `${process.env.BASE_URL}/verify/${token}`;
+  const url = `${process.env.APP_URL}/verify/${token}`;
   return sendMail({
     to: user.email,
     subject: "กรุณายืนยันอีเมลของคุณ",
@@ -43,7 +43,7 @@ const uploadBufferToCloudinary = (buffer, options) =>
   });
 
 const sendPasswordResetEmail = async (user, resetToken) => {
-  const url = `${process.env.BASE_URL}/reset-password/${resetToken}`;
+  const url = `${process.env.APP_URL}/reset-password/${resetToken}`;
   return sendMail({
     to: user.email,
     subject: "รีเซ็ตรหัสผ่านบัญชีของคุณ",
