@@ -25,7 +25,6 @@ const generateToken = (user) => {
 const sendVerificationEmail = async (user, token) => {
   const url = `${process.env.BASE_URL}/verify/${token}`;
   return sendMail({
-    from: `"Course System" <${process.env.EMAIL_USER}>`,
     to: user.email,
     subject: "กรุณายืนยันอีเมลของคุณ",
     text: `คลิกเพื่อยืนยัน: ${url}`,
@@ -46,7 +45,6 @@ const uploadBufferToCloudinary = (buffer, options) =>
 const sendPasswordResetEmail = async (user, resetToken) => {
   const url = `${process.env.BASE_URL}/reset-password/${resetToken}`;
   return sendMail({
-    from: `"Course System" <${process.env.EMAIL_USER}>`,
     to: user.email,
     subject: "รีเซ็ตรหัสผ่านบัญชีของคุณ",
     text: `เราได้รับคำขอรีเซ็ตรหัสผ่านสำหรับบัญชีนี้\n\nคลิกเพื่อรีเซ็ตรหัสผ่าน: ${url}\nลิงก์นี้มีอายุ 1 ชั่วโมง และใช้งานได้เพียงครั้งเดียว`,

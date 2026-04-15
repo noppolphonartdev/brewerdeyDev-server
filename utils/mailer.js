@@ -1,32 +1,29 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendMail = async ({ to, subject, text, html }) => {
-  const { EMAIL_USER, EMAIL_PASS, MAIL_FROM } = process.env;
+  const { RESEND_API_KEY, EMAIL_FROM } = process.env;
 
-  if (!EMAIL_USER || !EMAIL_PASS) {
-    console.warn(
-      "ยังไม่ได้ตั้ง EMAIL_USER/EMAIL_PASS ใน .env -> ข้ามการส่งเมล",
-    );
+  if (!RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY not configured in .env -> skipping email");
     return false;
   }
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: EMAIL_USER,
-      pass: EMAIL_PASS,
-    },
-  });
+  try {
+    await resend.emails.send({
+      from: EMAIL_FROM || "onboarding@resend.dev",
+      to,
+      subject,
+      text,
+      html,
+    });
 
-  await transporter.sendMail({
-    from: MAIL_FROM || `"CourseSi" <${EMAIL_USER}>`,
-    to,
-    subject,
-    text,
-    html,
-  });
-
-  return true;
+    return true;
+  } catch (error) {
+    console.error("Resend email error:", error);
+    return false;
+  }
 };
 
 module.exports = { sendMail };
