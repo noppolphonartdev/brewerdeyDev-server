@@ -11,7 +11,11 @@ const PORT = process.env.PORT || 5000;
 /* -----------------------------
  * Middleware พื้นฐาน
  * ----------------------------- */
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  }),
+);
 app.use(cors());
 app.use(express.json({ limit: "10mb" })); // สำหรับ payload JSON ทั่วไป (multer ดูแล multipart)
 app.use(mongoSanitize()); // mongoSanitize (ป้องกัน NoSQL Injection)
