@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
 require("dotenv").config();
 
 const app = express();
@@ -10,6 +11,7 @@ const PORT = process.env.PORT || 5000;
 /* -----------------------------
  * Middleware พื้นฐาน
  * ----------------------------- */
+app.use(helmet());
 app.use(cors());
 app.use(express.json({ limit: "10mb" })); // สำหรับ payload JSON ทั่วไป (multer ดูแล multipart)
 // mongoSanitize (ป้องกัน NoSQL Injection)
