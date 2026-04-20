@@ -12,7 +12,14 @@ const PORT = process.env.PORT || 5000;
  * ----------------------------- */
 app.use(cors());
 app.use(express.json({ limit: "10mb" })); // สำหรับ payload JSON ทั่วไป (multer ดูแล multipart)
-app.use(mongoSanitize()); // mongoSanitize (ป้องกัน NoSQL Injection)
+// mongoSanitize (ป้องกัน NoSQL Injection)
+// ทำเป็น Custom Middleware แทนเพื่อแก้ปัญหาบั๊ก req.query getter ใน Express 5
+app.use((req, res, next) => {
+  if (req.body) Object.assign(req.body, mongoSanitize.sanitize(req.body));
+  if (req.params) Object.assign(req.params, mongoSanitize.sanitize(req.params));
+  if (req.query) Object.assign(req.query, mongoSanitize.sanitize(req.query));
+  next();
+});
 
 /* -----------------------------
  * Routes
