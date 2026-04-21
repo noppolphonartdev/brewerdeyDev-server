@@ -29,7 +29,7 @@ exports.updateMember = async (req, res) => {
     });
 
     const updated = await User.findByIdAndUpdate(id, updates, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     }).select("-password");
 
@@ -99,11 +99,9 @@ exports.getMemberQuizStats = async (req, res) => {
 
     res.json({ user, courses });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        message: "เกิดข้อผิดพลาดในการโหลดคะแนนสมาชิก",
-        error: err.message,
-      });
+    res.status(500).json({
+      message: "เกิดข้อผิดพลาดในการโหลดคะแนนสมาชิก",
+      error: err.message,
+    });
   }
 };

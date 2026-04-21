@@ -25,7 +25,8 @@ function buildAnswerResolver(answersRaw = []) {
 
   return {
     mode: "byIndex",
-    getAnswerByIndex: (_, i) => (typeof answers[i] === "number" ? answers[i] : -1),
+    getAnswerByIndex: (_, i) =>
+      typeof answers[i] === "number" ? answers[i] : -1,
     savePayload: answers,
   };
 }
@@ -185,7 +186,7 @@ async function issueCertificateIfEligible(userId, courseId) {
         issuedAt: new Date(),
       },
     },
-    { new: true, upsert: true }
+    { returnDocument: "after", upsert: true },
   );
 
   return cert;
@@ -203,7 +204,13 @@ exports.getQuizStatus = async (req, res) => {
     if (!cq) {
       return res.json({
         pre: { attemptCount: 0, lastScore: 0, bestScore: 0, total: 0 },
-        post: { attemptCount: 0, lastScore: 0, bestScore: 0, total: 0, passed: false },
+        post: {
+          attemptCount: 0,
+          lastScore: 0,
+          bestScore: 0,
+          total: 0,
+          passed: false,
+        },
       });
     }
 
@@ -211,7 +218,11 @@ exports.getQuizStatus = async (req, res) => {
     const postTotal = cq.postTest?.length ?? 0;
 
     const pre = await QuizSubmission.findOne({ userId, courseId, type: "pre" });
-    const post = await QuizSubmission.findOne({ userId, courseId, type: "post" });
+    const post = await QuizSubmission.findOne({
+      userId,
+      courseId,
+      type: "post",
+    });
 
     res.json({
       pre: pre
@@ -231,7 +242,13 @@ exports.getQuizStatus = async (req, res) => {
             total: post.total || postTotal,
             passed: !!post.passed,
           }
-        : { attemptCount: 0, lastScore: 0, bestScore: 0, total: postTotal, passed: false },
+        : {
+            attemptCount: 0,
+            lastScore: 0,
+            bestScore: 0,
+            total: postTotal,
+            passed: false,
+          },
     });
   } catch (err) {
     res.status(500).json({ message: err.message || "Server error" });
@@ -248,10 +265,14 @@ exports.submitPreTest = async (req, res) => {
     const { answers } = req.body;
 
     const cq = await CourseQuiz.findOne({ courseId });
-    if (!cq) return res.status(404).json({ message: "ไม่พบชุดข้อสอบของคอร์สนี้" });
+    if (!cq)
+      return res.status(404).json({ message: "ไม่พบชุดข้อสอบของคอร์สนี้" });
 
     const quizItems = cq.preTest || [];
-    if (!quizItems.length) return res.status(400).json({ message: "คอร์สนี้ยังไม่มีข้อสอบ pre-test" });
+    if (!quizItems.length)
+      return res
+        .status(400)
+        .json({ message: "คอร์สนี้ยังไม่มีข้อสอบ pre-test" });
 
     const validation = validateQuizAnswers(answers, quizItems);
     if (!validation.valid) {
@@ -260,7 +281,11 @@ exports.submitPreTest = async (req, res) => {
 
     // ถ้าต้องการให้ pre-test ทำครั้งเดียว
     if (cq.requirePreTest) {
-      const existing = await QuizSubmission.findOne({ userId, courseId, type: "pre" });
+      const existing = await QuizSubmission.findOne({
+        userId,
+        courseId,
+        type: "pre",
+      });
       if (existing?.attemptCount >= 1) {
         return res.status(400).json({ message: "Pre-test ทำได้ครั้งเดียว" });
       }
@@ -276,7 +301,7 @@ exports.submitPreTest = async (req, res) => {
         $inc: { attemptCount: 1 },
         $setOnInsert: { bestScore: score, lastScore: score },
       },
-      { new: true, upsert: true }
+      { returnDocument: "after", upsert: true },
     );
 
     submission.lastScore = score;
@@ -304,10 +329,14 @@ exports.submitPostTest = async (req, res) => {
     const { answers } = req.body;
 
     const cq = await CourseQuiz.findOne({ courseId });
-    if (!cq) return res.status(404).json({ message: "ไม่พบชุดข้อสอบของคอร์สนี้" });
+    if (!cq)
+      return res.status(404).json({ message: "ไม่พบชุดข้อสอบของคอร์สนี้" });
 
     const quizItems = cq.postTest || [];
-    if (!quizItems.length) return res.status(400).json({ message: "คอร์สนี้ยังไม่มีข้อสอบ post-test" });
+    if (!quizItems.length)
+      return res
+        .status(400)
+        .json({ message: "คอร์สนี้ยังไม่มีข้อสอบ post-test" });
 
     const validation = validateQuizAnswers(answers, quizItems);
     if (!validation.valid) {
@@ -315,7 +344,11 @@ exports.submitPostTest = async (req, res) => {
     }
 
     // ถ้าคุณต้องการกันทำซ้ำหลังผ่านแล้ว
-    const existing = await QuizSubmission.findOne({ userId, courseId, type: "post" });
+    const existing = await QuizSubmission.findOne({
+      userId,
+      courseId,
+      type: "post",
+    });
     if (existing?.passed) {
       return res.status(400).json({ message: "คุณผ่าน Post-test แล้ว" });
     }
@@ -334,7 +367,7 @@ exports.submitPostTest = async (req, res) => {
         $inc: { attemptCount: 1 },
         $setOnInsert: { bestScore: score, lastScore: score },
       },
-      { new: true, upsert: true }
+      { returnDocument: "after", upsert: true },
     );
 
     submission.lastScore = score;
@@ -345,7 +378,9 @@ exports.submitPostTest = async (req, res) => {
     await submission.save();
 
     // ผ่านแล้วค่อยลองออก certificate
-    const cert = passed ? await issueCertificateIfEligible(userId, courseId) : null;
+    const cert = passed
+      ? await issueCertificateIfEligible(userId, courseId)
+      : null;
 
     res.json({
       score,

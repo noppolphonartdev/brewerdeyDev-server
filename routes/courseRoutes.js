@@ -246,7 +246,7 @@ router.put("/:id/progress", verifyToken, async (req, res) => {
       },
       {
         upsert: true,
-        new: true,
+        returnDocument: "after",
         setDefaultsOnInsert: true,
       },
     );
@@ -282,7 +282,7 @@ router.post("/", verifyToken, isAdmin, async (req, res) => {
           preTest: Array.isArray(preTest) ? preTest : [],
           postTest: Array.isArray(postTest) ? postTest : [],
         },
-        { upsert: true, new: true, setDefaultsOnInsert: true },
+        { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
       );
     }
 
@@ -306,7 +306,7 @@ router.put("/:id", verifyToken, isAdmin, async (req, res) => {
         req.params.id,
         courseData,
         {
-          new: true,
+          returnDocument: "after",
           runValidators: true,
         },
       );
@@ -334,7 +334,7 @@ router.put("/:id", verifyToken, isAdmin, async (req, res) => {
       await CourseQuiz.findOneAndUpdate(
         { courseId: req.params.id },
         quizUpdate,
-        { upsert: true, new: true, setDefaultsOnInsert: true },
+        { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
       );
     }
 
@@ -618,7 +618,7 @@ async function issueCertificateIfEligible(userId, courseId) {
         issuedAt: new Date(),
       },
     },
-    { new: true, upsert: true },
+    { returnDocument: "after", upsert: true },
   );
 
   return cert;

@@ -34,7 +34,7 @@ router.patch("/read-all", verifyToken, async (req, res) => {
   try {
     await Notification.updateMany(
       { userId: req.user.id, isRead: false },
-      { isRead: true }
+      { isRead: true },
     );
     res.json({ ok: true });
   } catch (err) {
@@ -48,7 +48,7 @@ router.patch("/:id/read", verifyToken, async (req, res) => {
     const noti = await Notification.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
       { isRead: true },
-      { new: true }
+      { returnDocument: "after" },
     );
     if (!noti) return res.status(404).json({ message: "ไม่พบแจ้งเตือน" });
     res.json(noti);
@@ -91,7 +91,7 @@ router.patch("/admin/read-all", verifyToken, isAdmin, async (req, res) => {
   try {
     await Notification.updateMany(
       { adminId: req.user.id, recipientType: "admin", isRead: false },
-      { isRead: true }
+      { isRead: true },
     );
     res.json({ ok: true });
   } catch (err) {
@@ -105,7 +105,7 @@ router.patch("/admin/:id/read", verifyToken, isAdmin, async (req, res) => {
     const noti = await Notification.findOneAndUpdate(
       { _id: req.params.id, adminId: req.user.id, recipientType: "admin" },
       { isRead: true },
-      { new: true }
+      { returnDocument: "after" },
     );
     if (!noti) return res.status(404).json({ message: "ไม่พบแจ้งเตือน" });
     res.json(noti);
