@@ -73,15 +73,8 @@ exports.register = async (req, res) => {
 
     console.log("Step 2: Creating new user...");
     const user = new User({ name, lastname, email, password });
-    console.log("Step 2.5: User object before save:", {
-      password: user.password,
-    });
     console.log("Step 3: Saving user...");
     await user.save();
-    console.log("Step 3.5: User object after save:", {
-      password: user.password,
-    });
-
     console.log("Step 4: Creating JWT token...");
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
