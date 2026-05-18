@@ -345,6 +345,41 @@ router.put("/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
+// PATCH /api/courses/:id/certificate-status => เปิด/ปิดการออก certificate รายคอร์ส
+router.patch(
+  "/:id/certificate-status",
+  verifyToken,
+  isAdmin,
+  async (req, res) => {
+    try {
+      const { certificateEnabled } = req.body || {};
+      if (typeof certificateEnabled !== "boolean") {
+        return res.status(400).json({
+          error: "certificateEnabled ต้องเป็น boolean",
+        });
+      }
+
+      const updatedCourse = await Course.findByIdAndUpdate(
+        req.params.id,
+        { certificateEnabled },
+        {
+          returnDocument: "after",
+          runValidators: true,
+        },
+      );
+
+      if (!updatedCourse) {
+        return res.status(404).json({ error: "Course not found" });
+      }
+
+      return res.json(updatedCourse);
+    } catch (err) {
+      console.error("Update course certificate status error:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  },
+);
+
 // DELETE /api/courses/:id => ลบคอร์ส + ลบชุดข้อสอบ
 router.delete("/:id", verifyToken, isAdmin, async (req, res) => {
   try {
@@ -572,6 +607,9 @@ router.post("/:id/quiz/:type", verifyToken, async (req, res) => {
 // ฟังก์ชันออก Certificate ถ้าเข้าเงื่อนไข
 // =======================
 async function issueCertificateIfEligible(userId, courseId) {
+  const course = await Course.findById(courseId).select("certificateEnabled");
+  if (!course || !course.certificateEnabled) return null;
+
   // 1) ต้องมี order paid ก่อน
   const paidOrder = await Order.findOne({
     userId,

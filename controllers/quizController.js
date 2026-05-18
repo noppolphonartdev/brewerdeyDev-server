@@ -2,6 +2,7 @@ const QuizSubmission = require("../models/QuizSubmission");
 const CourseQuiz = require("../models/CourseQuiz");
 const Order = require("../models/Order");
 const Certificate = require("../models/Certificate");
+const Course = require("../models/Course");
 
 /* --------------------------------------------
  * helper: แปลง answers ให้ตรวจได้ทั้ง 2 แบบ
@@ -143,6 +144,9 @@ function computeScore(quizItems, resolver) {
  * ออก Certificate ถ้าเข้าเงื่อนไข
  * -------------------------------------------- */
 async function issueCertificateIfEligible(userId, courseId) {
+  const course = await Course.findById(courseId).select("certificateEnabled");
+  if (!course || !course.certificateEnabled) return null;
+
   // 1) เช็คว่ามี Order paid แล้ว
   const paidOrder = await Order.findOne({
     userId,

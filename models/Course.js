@@ -26,11 +26,12 @@ const courseSchema = new mongoose.Schema(
     whatYouWillLearn: String,
     targetAudience: String,
     requirements: String,
+    certificateEnabled: { type: Boolean, default: false },
 
     // ======= Curriculum  =======
     curriculum: { type: [SectionSchema], default: [] },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports =

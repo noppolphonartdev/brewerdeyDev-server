@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const verifyToken = require("../middleware/verifyToken");
 const Certificate = require("../models/Certificate");
+const Course = require("../models/Course");
 const Order = require("../models/Order");
 const QuizSubmission = require("../models/QuizSubmission");
 const CourseQuiz = require("../models/CourseQuiz");
@@ -35,6 +36,11 @@ router.get("/:courseId/me", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const courseId = req.params.courseId;
+
+    const course = await Course.findById(courseId).select("certificateEnabled");
+    if (!course || !course.certificateEnabled) {
+      return res.status(404).json({ hasCertificate: false });
+    }
 
     const cert = await Certificate.findOne({
       userId,
